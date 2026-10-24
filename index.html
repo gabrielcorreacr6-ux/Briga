@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#0b0d14"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="icon-192.png"><title>Briga da Firma</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+/* Layout: telas de menu em painéis escuros; palco 16:9 centralizado com controles de toque nas laterais. */
+:root{
+  --bg:#0b0d12; --panel:#151a24; --panel2:#1d2431; --line:#2c3547;
+  --text:#eef1f6; --muted:#9aa6b8; --accent:#ffd84a; --accent-ink:#1a1500;
+  --hot:#ff5c8a; --ok:#4be38a; --sec:#b57bff;
+  --px:'Press Start 2P',ui-monospace,Menlo,monospace;
+  --ui:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;height:100%;background:var(--bg);color:var(--text);font:15px/1.45 var(--ui);overflow:hidden}
+:root{padding:0!important}
+button{font:inherit;color:inherit;cursor:pointer}
+textarea{font:12px/1.3 ui-monospace,Menlo,monospace;width:100%;height:84px;background:#0a0d13;color:var(--text);border:1px solid var(--line);border-radius:8px;padding:8px;resize:none;user-select:text;-webkit-user-select:text}
+.screen{position:fixed;inset:0;display:none;overflow:auto;padding:max(18px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) max(24px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));background:radial-gradient(900px 500px at 15% -10%,#26324a 0,transparent 60%),radial-gradient(700px 500px at 100% 110%,#3a1f3d 0,transparent 55%),var(--bg);z-index:5;touch-action:manipulation}
+.screen.on{display:block}
+.wrap{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+h1{font:22px/1.3 var(--px);margin:6px 0 0;color:var(--accent);text-shadow:3px 3px 0 #7a2a00;letter-spacing:1px;text-wrap:balance}
+h2{font:14px/1.5 var(--px);margin:0;color:var(--accent);text-wrap:balance}
+p{margin:0}
+.muted{color:var(--muted)}
+.btn{display:block;width:100%;text-align:left;padding:14px 16px;border-radius:10px;border:1px solid var(--line);background:var(--panel);min-height:52px}
+.btn b{display:block;font-size:16px}
+.btn span{color:var(--muted);font-size:13px}
+.btn:hover,.btn:focus-visible{border-color:var(--accent);outline:none}
+.btn.main{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.main span{color:#4a3d00}
+.btn.sm{width:auto;display:inline-block;padding:10px 14px;min-height:44px;text-align:center}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.row>*{flex:1 1 150px;min-width:0}
+.box{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.step{font:10px/1.6 var(--px);color:var(--muted)}
+.status{font-size:13px;color:var(--muted);min-height:20px}
+.status.ok{color:var(--ok)} .status.err{color:var(--hot)}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+@media(max-width:520px){.grid{grid-template-columns:repeat(2,1fr)}}
+.card{background:var(--panel);border:2px solid var(--line);border-radius:12px;padding:8px 6px 10px;display:flex;flex-direction:column;align-items:center;gap:4px;min-width:0}
+.card canvas{width:96px;height:96px;image-rendering:pixelated;max-width:100%}
+.card b{font:9px/1.4 var(--px);text-align:center}
+.card.sel{border-color:var(--accent);background:var(--panel2)}
+.card.peer{border-color:var(--hot)}
+.info{font-size:13.5px;display:flex;flex-direction:column;gap:6px}
+.info div b{color:var(--accent)}
+.info .s b{color:var(--sec)}
+#stage{position:fixed;inset:0;background:#000;display:none;align-items:center;justify-content:center;z-index:2;touch-action:none}
+#stage.on{display:flex}
+#cv{width:min(100vw,calc(100vh*16/9));height:auto;aspect-ratio:16/9;image-rendering:pixelated;image-rendering:crisp-edges;image-rendering:pixelated;background:#111;display:block}
+#pad{position:absolute;inset:0;pointer-events:none;display:none;z-index:3}
+#pad.on{display:block}
+#dp{position:absolute;left:max(18px,env(safe-area-inset-left));bottom:max(16px,env(safe-area-inset-bottom));width:min(40vh,170px);height:min(40vh,170px);pointer-events:auto;touch-action:none}
+#dp i{position:absolute;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(24,28,40,.62);border:2px solid rgba(255,255,255,.5);color:#fff;font:normal 700 15px/1 var(--ui);gap:2px;backdrop-filter:blur(2px)}
+#dp i small{font:7px/1 var(--px);opacity:.8}
+#dp .u{left:33%;top:0;width:34%;height:36%;border-radius:12px 12px 4px 4px}
+#dp .d{left:33%;bottom:0;width:34%;height:36%;border-radius:4px 4px 12px 12px}
+#dp .l{left:0;top:33%;width:36%;height:34%;border-radius:12px 4px 4px 12px}
+#dp .r{right:0;top:33%;width:36%;height:34%;border-radius:4px 12px 12px 4px}
+#dp .c{left:33%;top:33%;width:34%;height:34%;border:0;background:rgba(24,28,40,.62);border-radius:0}
+#dp i.on{background:rgba(255,216,74,.7);color:#1a1500;border-color:var(--accent)}
+#fc{position:absolute;right:max(18px,env(safe-area-inset-right));bottom:max(16px,env(safe-area-inset-bottom));width:min(48vh,200px);height:min(48vh,200px);pointer-events:none}
+.fb{position:absolute;pointer-events:auto;touch-action:none;width:40%;height:40%;border-radius:50%;border:3px solid var(--c);background:rgba(18,22,32,.62);color:var(--c);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0;gap:2px;backdrop-filter:blur(2px);font:700 min(7vh,30px)/1 var(--ui)}
+.fb small{font:7px/1 var(--px);color:#fff;opacity:.9}
+.fb.dn{background:var(--c);color:#111}.fb.dn small{color:#111}
+.fb.ready{box-shadow:0 0 16px 3px var(--c)}
+.fb.secr{--c:#b57bff!important;box-shadow:0 0 18px 4px #b57bff}
+.fb.cd{opacity:.45}
+#bS{left:30%;top:0;--c:#4ad6a0}
+#bA{left:30%;bottom:0;--c:#6aa8ff}
+#bB{left:0;top:30%;--c:#ff8ad8}
+#bC{right:0;top:30%;--c:#ff5a5a}
+#padtog{position:absolute;top:max(6px,env(safe-area-inset-top));left:max(6px,env(safe-area-inset-left));z-index:3;background:rgba(0,0,0,.5);border:1px solid #555;border-radius:8px;padding:6px 10px;font-size:12px}
+#mute{position:fixed;bottom:max(10px,env(safe-area-inset-bottom));right:10px;z-index:50;background:rgba(0,0,0,.55);border:1px solid #555;border-radius:8px;padding:6px 10px;font-size:12px;color:#fff;opacity:.85}
+#stage.on~#mute{top:max(6px,env(safe-area-inset-top));bottom:auto;right:64px}
+#quit{position:absolute;top:max(6px,env(safe-area-inset-top));right:max(6px,env(safe-area-inset-right));z-index:3;background:rgba(0,0,0,.5);border:1px solid #555;border-radius:8px;padding:6px 10px;font-size:12px}
+#end{position:absolute;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.65);z-index:4}
+#end.on{display:flex}
+#end .box{width:min(92vw,420px);text-align:center;align-items:stretch}
+#rotate{position:fixed;inset:0;display:none;z-index:9;background:rgba(5,6,10,.94);align-items:center;justify-content:center;text-align:center;padding:24px;font:12px/1.8 var(--px)}
+@media(orientation:portrait) and (pointer:coarse){#stage.on~#rotate{display:flex}}
+#toast{position:fixed;left:50%;top:14px;transform:translateX(-50%);background:#000c;border:1px solid var(--line);padding:8px 14px;border-radius:10px;z-index:20;display:none;font-size:13px;max-width:92vw}
+.how li{margin:0 0 6px}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head><body>
+
+<!-- MENU -->
+<div id="s-menu" class="screen on"><div class="wrap">
+  <h1>BRIGA DA FIRMA</h1>
+  <p class="muted">Luta 2D para dois jogadores. Sete lutadores, cada um com poder, especial e um golpe secreto que aparece quando a vida está no fim.</p>
+  <button class="btn main" id="m-online"><b>Jogar online (2 celulares)</b><span>Cada um no seu aparelho, com código de sala de 4 letras</span></button>
+  <button class="btn" id="m-cpu"><b>Treino contra o computador</b><span>Para testar os lutadores sozinho</span></button>
+  <button class="btn" id="m-local"><b>2 jogadores no mesmo aparelho</b><span>Precisa de teclado (um de cada lado)</span></button>
+  <button class="btn" id="m-how"><b>Como jogar</b><span>Controles e regras</span></button>
+</div></div>
+
+<!-- COMO JOGAR -->
+<div id="s-how" class="screen"><div class="wrap how">
+  <h2>COMO JOGAR</h2>
+  <div class="box">
+    <p><b>Celular:</b> direcional na esquerda (para cima pula, para baixo defende, e dá para deslizar o dedo). Botões na direita, como no PlayStation: ✕ soco, □ chute, ○ poder, △ especial. Se os botões não aparecerem, toque na tela ou no botão "Controles".</p>
+    <p><b>Teclado jogador 1:</b> A/D andar, W pular, S defender, F soco, G chute, H poder, T especial.</p>
+    <p><b>Teclado jogador 2:</b> setas, vírgula soco, ponto chute, barra poder, ponto e vírgula especial. Contra o computador ou online, as setas e Z X C V também funcionam.</p>
+  </div>
+  <div class="box">
+    <ul style="margin:0;padding-left:18px">
+      <li>A melhor de 3 rounds. Cada round tem 99 segundos; no tempo, vence quem tem mais vida.</li>
+      <li>A barra azul de energia enche ao bater, ao apanhar e com o tempo. Com ela cheia, o ESPECIAL fica liberado.</li>
+      <li>Com a vida em 25% ou menos, o especial vira o golpe SECRETO (cor roxa e aura).</li>
+      <li>Roubo de vida: todo golpe que acerta (sem ser defendido) recupera 2% da vida de quem bate. O KBene não tem isso, ele cura pela passiva.</li>
+      <li>O PODER tem tempo de recarga. Os especiais não podem ser defendidos, mas dá para pular por cima dos que correm pelo chão.</li>
+    </ul>
+  </div>
+  <button class="btn sm" data-go="s-menu">Voltar</button>
+</div></div>
+
+<!-- ONLINE -->
+<div id="s-online" class="screen"><div class="wrap">
+  <h2>JOGAR ONLINE</h2>
+  <p class="muted">Um jogador cria a sala e passa o código de 4 letras; o outro digita o código. Funciona em redes e lugares diferentes, precisa de internet.</p>
+  <div class="row"><button class="btn main" id="q-host"><b>Criar sala</b><span>Você recebe um código</span></button>
+  <button class="btn" id="q-join"><b>Entrar na sala</b><span>Você digita o código</span></button></div>
+  <div class="box" id="q-hostbox" hidden>
+    <p>Passe este código para o amigo:</p>
+    <div id="q-code-show" style="font:28px var(--px);letter-spacing:6px;text-align:center;padding:10px 0;color:var(--accent)">----</div>
+    <p class="muted">Aguardando o amigo entrar...</p>
+  </div>
+  <div class="box" id="q-joinbox" hidden>
+    <p>Digite o código que o amigo passou:</p>
+    <input id="q-code" maxlength="4" autocapitalize="characters" autocomplete="off" spellcheck="false" style="font:28px var(--px);letter-spacing:6px;text-align:center;width:100%;padding:10px;background:#000;color:#fff;border:2px solid #555;border-radius:10px;text-transform:uppercase">
+    <button class="btn sm main" id="q-go">Entrar</button>
+  </div>
+  <details class="box"><summary>Modo manual (troca de códigos longos)</summary>
+  <p class="muted">Use só se o modo acima não conectar. Um celular gera um código, o outro devolve uma resposta.</p>
+  <div class="row"><button class="btn main" id="o-host"><b>Criar sala</b><span>Você gera o código</span></button>
+  <button class="btn" id="o-join"><b>Entrar na sala</b><span>Você recebe o código</span></button></div>
+  <div class="box" id="o-hostbox" hidden>
+    <div class="step">PASSO 1</div><p>Envie este código para o amigo (WhatsApp, por exemplo):</p>
+    <textarea id="h-offer" readonly></textarea>
+    <div class="row"><button class="btn sm" id="h-copy">Copiar código</button></div>
+    <div class="step">PASSO 2</div><p>Cole aqui o código de resposta que ele devolver:</p>
+    <textarea id="h-ans" placeholder="Cole a resposta aqui"></textarea>
+    <button class="btn sm main" id="h-go">Conectar</button>
+  </div>
+  <div class="box" id="o-joinbox" hidden>
+    <div class="step">PASSO 1</div><p>Cole o código que o amigo enviou:</p>
+    <textarea id="g-offer" placeholder="Cole o código da sala aqui"></textarea>
+    <button class="btn sm main" id="g-go">Gerar resposta</button>
+    <div class="step">PASSO 2</div><p>Devolva este código para o amigo:</p>
+    <textarea id="g-ans" readonly></textarea>
+    <div class="row"><button class="btn sm" id="g-copy">Copiar resposta</button></div>
+  </div>
+  </details>
+  <div class="status" id="o-status"></div>
+  <button class="btn sm" data-go="s-menu" id="o-back">Voltar</button>
+</div></div>
+
+<!-- SELEÇÃO -->
+<div id="s-select" class="screen"><div class="wrap">
+  <div class="step" id="sel-step">JOGADOR 1</div>
+  <h2 id="sel-title">ESCOLHA SEU LUTADOR</h2>
+  <div class="grid" id="sel-grid"></div>
+  <div class="box info" id="sel-info"></div>
+  <div class="status" id="sel-status"></div>
+  <div class="row"><button class="btn sm main" id="sel-ok">Confirmar</button><button class="btn sm" id="sel-back">Sair</button></div>
+</div></div>
+
+<!-- PALCO -->
+<div id="stage">
+  <canvas id="cv" width="480" height="270"></canvas>
+  <div id="pad">
+    <div id="dp"><i class="u" data-k="4">▲<small>PULO</small></i><i class="l" data-k="1">◀</i><i class="c"></i><i class="r" data-k="2">▶</i><i class="d" data-k="8">▼<small>DEFESA</small></i></div>
+    <div id="fc">
+      <button class="fb" id="bS" data-b="128">△<small>ESPECIAL</small></button>
+      <button class="fb" id="bB" data-b="32">□<small>CHUTE</small></button>
+      <button class="fb" id="bC" data-b="64">○<small>PODER</small></button>
+      <button class="fb" id="bA" data-b="16">✕<small>SOCO</small></button>
+    </div>
+  </div>
+  <button id="padtog">Controles</button>
+  <button id="quit">Sair</button>
+  <div id="end"><div class="box"><h2 id="end-t">VENCEDOR</h2><p id="end-s" class="muted"></p>
+    <button class="btn main" id="end-re"><b>Jogar de novo</b></button><button class="btn" id="end-menu"><b>Menu</b></button></div></div>
+</div>
+<div id="rotate">GIRE O CELULAR<br>PARA O MODO PAISAGEM</div>
+<button id="mute">Música: ON</button>
+<div id="jserr" style="display:none;position:fixed;left:0;right:0;top:0;z-index:99;background:#a00;color:#fff;font:11px monospace;padding:6px;white-space:pre-wrap"></div>
+<div id="toast"></div>
+
+<script src="game.js"></script>
+<script>if("serviceWorker" in navigator)window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(){})});</script>
+</body></html>
