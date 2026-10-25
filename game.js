@@ -23,7 +23,7 @@ const CH={
   sk:{name:'FORMAÇÃO DE SEXTA-FEIRA',cd:14,close:null,wind:.3,rec:.4,run:'formacao',skill:1},
   sp:{name:'MAIS UM ATESTADO?',wind:.5,rec:.3,run:'reytransf',col:'#b57bff'},
   se:{name:'SEXTA-FEIRA',wind:.8,rec:.5,run:'sexta',col:'#ff9ac8'},
-  info:{style:'Corpo a corpo, lento. Golpes normais rasgam a defesa do inimigo.',skill:'<b>FORMAÇÃO DE SEXTA-FEIRA</b>: perto ou longe, 3 amigos correm e arrastam o inimigo, 50%.',sp:'<b>MAIS UM ATESTADO?</b>: ele se transforma por 25s: levita, fica mais resistente e ataca de longe com raios e tornados de papel (10% da vida do inimigo por golpe). Não usa poder, especial nem secreto enquanto isso.',se:'<b>SEXTA-FEIRA</b>: 4 amigos levam o inimigo embora, 75%.',def:'Rasga o escudo do inimigo.'}},
+  info:{style:'Corpo a corpo, lento. Golpes normais rasgam a defesa do inimigo.',skill:'<b>FORMAÇÃO DE SEXTA-FEIRA</b>: perto ou longe, 3 amigos correm e arrastam o inimigo, 50%.',sp:'<b>MAIS UM ATESTADO?</b>: ele se transforma por 25s: levita, fica mais resistente e ataca de longe com raios e tornados de papel (10%, 15% e 20% da vida do inimigo, subindo com o tempo) e cura 10% da própria vida por golpe. Pode usar poder e especial (renova a forma); o secreto fica bloqueado.',se:'<b>SEXTA-FEIRA</b>: 4 amigos levam o inimigo embora, 75%.',def:'Rasga o escudo do inimigo.'}},
  dpaul:{name:"D'Paul",short:"D'PAUL",speed:88,jump:300,spec:50,bp:5,atkSpd:.85,bw:1.28,belly:1,long:1,beard:1,
   pal:{skin:'#b0714a',hair:'#1f1a18',hairT:'short',up:'#e8561a',lo:'#e8561a',str:'#9aa0a4',str2:'#9aa0a4',pants:'#e8561a',boots:'#2a2220',lan:'#111',flag:1},
   sec:{up:'#7a1fb0',lo:'#7a1fb0',str:'#ffe27a',pants:'#7a1fb0',aura:'#d27bff'},strT:'cov',
@@ -188,7 +188,7 @@ const RUN={
  },
  celestial(G,p,e){G.fx.push({t:'beam',o:p.i,x:e.x,age:0,dur:1.15,hitAt:.55,w:34,dmg:70,c1:'#ffffff',c2:'#8fd6ff',did:false})},
  nss(G,p,e){G.fx.push({t:'beam',o:p.i,x:e.x,age:0,dur:1.15,hitAt:.55,w:60,dmg:90,c1:'#fff1a8',c2:'#b57bff',did:false})},
- formacao(G,p,e){G.fx.push(runner(p,{n:3,sp:260,dmg:50,stun:.9,drag:230,dragT:.8,kind:'skill'}))},
+ formacao(G,p,e){G.fx.push(runner(p,{n:3,sp:260,dmg:50,stun:.9,drag:230,dragT:.8,kind:'skill'}));if(p.tf>0)G.fx.push({t:'wind',o:p.i,x:p.x,dir:p.face,age:0,dur:1.6})},
  jorge(G,p,e){G.fx.push(runner(p,{n:1,size:1.7,sp:300,dmg:80,stun:1.4,drag:260,dragT:1}))},
  sexta(G,p,e){G.fx.push(runner(p,{n:4,sp:340,dmg:75,stun:2.8,drag:0,dragT:.2,away:true}))},
  inxado(G,p,e){p.leap={t:0,dur:.5,x0:p.x,h:85};ev(G,'jump')},
@@ -219,7 +219,8 @@ const RUN={
  jamaisnov(G,p,e){const sa=p.sa;p.sa=0;lock(e,3.1,'zap');lock(p,3.1,'finger');p.sa=sa;p.ns=true;G.fx.push({t:'storm',o:p.i,v:e.i,age:0,dur:3,n:7,done:0,dmg:14,t0:.8})},
  subtransf(G,p,e){lock(p,2.4,'st1');p.sa=2.5;p.ns=true;p.tf=22.4;e.atk=null;e.cast=null;e.stun=Math.max(e.stun,2.5);e.dash=null;e.ns=true;G.fx.push({t:'subtr',o:p.i,v:e.i,age:0,dur:2.4});txt(G,p.x,p.y+90,'NATAL NA SEXTA-FEIRA?','#ffe84a')},
  submao2(G,p,e){lock(p,1.8,'sm2');p.sa=1.85;p.ns=true;G.fx.push({t:'sub2',o:p.i,v:e.i,age:0,dur:1.8,x0:p.x+p.face*30,x1:e.x,dir:p.face,h1:false,tp:false});txt(G,p.x,p.y+90,'ATESTADO SEGUNDA-FEIRA','#ff9aff')},
- reytransf(G,p,e){lock(p,2.5,'tf1');p.tf=27.5;p.lv=0;p.sa=2.6;p.inv=2.6;p.ns=true;G.fx.push({t:'transf',o:p.i,age:0,dur:2.5,ph:0});txt(G,p.x,p.y+90,'MAIS UM ATESTADO?','#d7a8ff')},
+ reytransf(G,p,e){if(p.tf>0){p.tf=25;p.lv=0;txt(G,p.x,p.y+92,'ATESTADO RENOVADO!','#d7a8ff');G.shake=Math.max(G.shake,8);G.fx.push({t:'wind',o:p.i,x:p.x,dir:p.face,age:0,dur:1.3,swirl:1});G.fx.push({t:'ring',x:p.x,age:0,dur:.6,col:'#d7a8ff'});return}
+ lock(p,2.5,'tf1');p.tf=27.5;p.lv=0;p.sa=2.6;p.inv=2.6;p.ns=true;G.fx.push({t:'transf',o:p.i,age:0,dur:2.5,ph:0});txt(G,p.x,p.y+90,'MAIS UM ATESTADO?','#d7a8ff')},
  copo(G,p,e){G.fx.push({t:'copo',o:p.i,v:e.i,age:0,dur:1,st:0,x0:p.x})},
  troco(G,p,e){p.hide=true;lock(p,1.1,'slide');p.ns=true;G.fx.push({t:'troco',o:p.i,v:e.i,age:0,dur:1.2,hitAt:.45,dmg:78,did:false,x0:p.x,dir:e.x>=p.x?1:-1})},
  bar(G,p,e){lock(e,3.5,'burn');G.fx.push({t:'bar',o:p.i,v:e.i,age:0,dur:3.5,ticks:8,done:0,dmg:95/8})},
@@ -295,7 +296,7 @@ function stepF(G,i,inp,dt){
  if(!p.leap){p.vy-=900*dt;p.y+=p.vy*dt;if(p.y<=0){p.y=0;p.vy=0}}
  p.x=clamp(p.x,16,W-16);
  if(free&&fight){
-  if(p.ch==='reymond'&&p.tf>0&&(pr&(BX|BS|BC))){txt(G,p.x,p.y+80,'BLOQUEADO','#b57bff');ev(G,'no')}
+  if(p.ch==='reymond'&&p.tf>0&&(pr&BX)){txt(G,p.x,p.y+80,'BLOQUEADO','#b57bff');ev(G,'no')}
   else if((pr&BX)&&p.en>=100&&p.secOn)startCast(G,p,e,'secret');
   else if((pr&BS)&&p.en>=100)startCast(G,p,e,'special');
   else if(pr&BC){if(p.ch==='jorge'&&p.mw>0){p.mw=0;p.cast={d:{wind:.12,rec:.55,run:'massu2',skill:1},t:0,fired:false};txt(G,p.x,p.y+78,'MASSUDINHO!','#ff9ad8');ev(G,'skill')}else startCast(G,p,e,'skill')}
@@ -516,6 +517,7 @@ function updFx(G,dt){
   }
   if(f.t==='beam'&&f.age>=f.dur)f.dead=true;
   if(f.t==='whisper'&&f.age>=f.dur)f.dead=true;
+  if(f.t==='wind'&&f.age>=f.dur)f.dead=true;
  }
  G.fx=G.fx.filter(f=>!f.dead);
 }
@@ -571,7 +573,7 @@ function aiBits(G,i,ai,dt){
   else if(ranged&&d<want-40)b|=away;
   const inR=d<=(ranged?260:(p.ch==='reymond'&&p.tf>0?420:62)),r=Math.random();
   if(p.en>=100&&!(p.ch==='reymond'&&p.tf>0))pr|=(p.secOn?BX:BS);
-  else if(!(p.ch==='reymond'&&p.tf>0)&&p.cd<=0&&r<.18&&(!CH[p.ch].sk.close||d<=CH[p.ch].sk.close-15))pr|=BC;
+  else if(p.cd<=0&&r<.18&&(!CH[p.ch].sk.close||d<=CH[p.ch].sk.close-15))pr|=BC;
   else if(inR&&r<.58)pr|=BA;else if(inR&&r<.72)pr|=BB;else if(r>.96)pr|=BU;
   ai.b=b;
  }
@@ -914,6 +916,17 @@ function drawFx(c2,f,G,t){
    break}
   case 'run':drawRunner(c2,f,t);break;
   case 'veh':drawVeh(c2,f,t);break;
+  case 'wind':{
+   const P=G.p[f.o],fa=Math.min(1,Math.min(f.age/.2,(f.dur-f.age)/.4));c2.save();c2.globalAlpha=fa*.8;
+   if(f.swirl){
+    for(let k=0;k<22;k++){const a=k*.9+f.age*10,r=8+((f.age*60+k*9)%64),y=GY-P.y-8-((k*17)%70),x=P.x+Math.cos(a)*r*1.3;F(x,y+Math.sin(a)*4,k%3?5:3,k%3?4:2,k%2?'#fbfbf6':'#d7a8ff')}
+    for(let k=0;k<3;k++){const q=((f.age*1.6+k*.33)%1);c2.globalAlpha=fa*(1-q)*.7;c2.strokeStyle='#e9d8ff';c2.lineWidth=2;c2.beginPath();c2.ellipse(P.x,GY-P.y-30-q*26,12+q*34,5+q*7,0,0,7);c2.stroke()}
+   }else{
+    const d=f.dir||1;
+    for(let k=0;k<26;k++){const y=GY-6-((k*23)%120),sp=620+(k%5)*90,x0=((f.age*sp+k*71)%(W+120))-60,x=d>0?x0:W-x0,len=26+(k%4)*14;F(d>0?x-len:x,y,len,1+(k%3===0?1:0),k%2?'rgba(235,240,255,.75)':'rgba(190,150,255,.6)')}
+    for(let k=0;k<14;k++){const sp=480+(k%4)*70,x0=((f.age*sp+k*113)%(W+60))-30,x=d>0?x0:W-x0,y=GY-14-((k*29)%100)+Math.sin(f.age*14+k)*7;F(x,y,6,4,'#fbfbf6');F(x+1,y+1,3,1,'#999')}
+   }
+   c2.restore();break}
   case 'paper':{const y=V.y+60+f.age*20;F(V.x-14,GY-y,28,20,'#fbfbf6');F(V.x-10,GY-y+4,20,2,'#999');F(V.x-10,GY-y+9,14,2,'#999');F(V.x+2,GY-y+13,8,4,'#c33');break}
   case 'hold':{for(let k=0;k<3;k++){const ox=(k-1)*30;drawFighter(c2,fake('moraes',V.x+ox,ox>0?-1:1,{st:'idle',cast:{}}),t,GY,1,null)}break}
   case 'ring':{const q=f.age/f.dur;c2.globalAlpha=1-q;c2.strokeStyle=f.col;c2.lineWidth=2;c2.strokeRect(f.x-8-q*50,GY-3-q*5,16+q*100,6+q*10);c2.globalAlpha=1;break}
