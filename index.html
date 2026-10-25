@@ -91,6 +91,22 @@ p{margin:0}
 #toast{position:fixed;left:50%;top:14px;transform:translateX(-50%);background:#000c;border:1px solid var(--line);padding:8px 14px;border-radius:10px;z-index:20;display:none;font-size:13px;max-width:92vw}
 .how li{margin:0 0 6px}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+.card[data-n]::after{content:attr(data-n);position:absolute;top:4px;left:6px;background:var(--accent);color:var(--accent-ink);font:10px/1 var(--px);padding:4px 5px;border-radius:6px}
+.card{position:relative}
+.plr{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:6px 0;border-bottom:1px solid var(--line);font-size:14px}
+.plr:last-child{border-bottom:0}.plr .tm{color:var(--muted);font-size:12px;text-align:right}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:#555;margin-right:8px}.dot.on{background:var(--ok)}
+table.t{width:100%;border-collapse:collapse;font-size:13px}table.t th{color:var(--muted);font-weight:600;text-align:left;padding:4px 6px}table.t td{padding:6px;border-top:1px solid var(--line)}
+table.t tr.q td{background:rgba(75,227,138,.08)}small.off{color:var(--hot)}
+.fx{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;padding:6px 0;border-top:1px solid var(--line);font-size:13px}
+.fx span:last-child{text-align:right}.fx b{font:9px var(--px);color:var(--muted)}.fx .w{color:var(--accent);font-weight:700}.fx.l b{color:var(--hot)}.fx.d b{color:var(--text)}
+.big{font:20px/1.4 var(--px);color:var(--accent);text-align:center;padding:8px 0}.big2{font:12px/1.6 var(--px);color:var(--text)}
+.box.champ{border-color:var(--accent);background:#2a2410;text-align:center}.box.live{border-color:var(--hot)}
+#cmsg{position:absolute;left:50%;top:16%;transform:translateX(-50%);background:rgba(0,0,0,.75);border:1px solid var(--hot);border-radius:10px;padding:8px 14px;font:11px/1.5 var(--px);z-index:6;display:none;text-align:center;max-width:90vw}
+#cres{position:absolute;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.6);z-index:5}
+#cres .box{text-align:center;min-width:240px}
+#ctab{position:absolute;top:max(6px,env(safe-area-inset-top));left:104px;z-index:3;background:rgba(0,0,0,.5);border:1px solid #555;border-radius:8px;padding:6px 10px;font-size:12px;display:none}
 </style>
 
 <!-- MENU -->
@@ -98,6 +114,7 @@ p{margin:0}
   <h1>BRIGA DA FIRMA</h1>
   <p class="muted">Luta 2D para dois jogadores. Onze lutadores, cada um com poder, especial e um golpe secreto que aparece quando a vida está no fim.</p>
   <button class="btn main" id="m-online"><b>Jogar online (2 celulares)</b><span>Cada um no seu aparelho, com código de sala de 4 letras</span></button>
+  <button class="btn main" id="m-champ"><b>Campeonato online (até 10)</b><span>Grupos e mata-mata, cada um com 3 lutadores, estilo KOF</span></button>
   <button class="btn" id="m-cpu"><b>Treino contra o computador</b><span>Para testar os lutadores sozinho</span></button>
   <button class="btn" id="m-local"><b>2 jogadores no mesmo aparelho</b><span>Precisa de teclado (um de cada lado)</span></button>
   <button class="btn" id="m-how"><b>Como jogar</b><span>Controles e regras</span></button>
@@ -164,6 +181,43 @@ p{margin:0}
   <button class="btn sm" data-go="s-menu" id="o-back">Voltar</button>
 </div></div>
 
+<!-- CAMPEONATO: ENTRADA -->
+<div id="s-champ" class="screen"><div class="wrap">
+  <h2>CAMPEONATO ONLINE</h2>
+  <p class="muted">De 2 a 10 amigos (mais 1 espectador), cada um no seu celular. Cada jogador escolhe 3 lutadores e luta em time, estilo KOF: quando um cai, entra o próximo. Se o organizador cair, outro jogador assume sozinho.</p>
+  <div class="box"><p>Seu nome no campeonato:</p><input id="c-name" maxlength="12" autocomplete="off" placeholder="Seu nome" style="font:16px var(--ui);width:100%;padding:12px;background:#000;color:#fff;border:2px solid #555;border-radius:10px"></div>
+  <label class="box" style="flex-direction:row;align-items:center;gap:10px"><input type="checkbox" id="c-sp" style="width:20px;height:20px"><span>Só assistir (espectador). Não luta; pode organizar a sala. 1 por campeonato.</span></label>
+  <div class="row"><button class="btn main" id="c-create"><b>Criar campeonato</b><span>Você vira o organizador e recebe um código</span></button>
+  <button class="btn" id="c-join"><b>Entrar com código</b><span>Digite as 4 letras</span></button></div>
+  <div class="box" id="c-joinbox" hidden>
+    <input id="c-code" maxlength="4" autocapitalize="characters" autocomplete="off" spellcheck="false" style="font:28px var(--px);letter-spacing:6px;text-align:center;width:100%;padding:10px;background:#000;color:#fff;border:2px solid #555;border-radius:10px;text-transform:uppercase">
+    <button class="btn sm main" id="c-go">Entrar</button>
+  </div>
+  <div class="row" id="c-back-row" hidden><button class="btn" id="c-again"><b>Voltar ao campeonato</b><span>Reconectar de onde parou</span></button></div>
+  <div class="status" id="c-status"></div>
+  <button class="btn sm" id="c-back">Voltar</button>
+</div></div>
+
+<!-- CAMPEONATO: SALA -->
+<div id="s-clobby" class="screen"><div class="wrap">
+  <h2>SALA DO CAMPEONATO</h2>
+  <div class="box"><div class="step">CÓDIGO DA SALA</div><div id="cl-code" style="font:28px var(--px);letter-spacing:6px;text-align:center;padding:6px 0;color:var(--accent)">----</div><p class="muted" style="text-align:center">Passe este código para os amigos.</p></div>
+  <div class="box"><div class="step">JOGADORES</div><div id="cl-list"></div></div>
+  <p class="muted" id="cl-fmt"></p>
+  <button class="btn main" id="cl-pick"><b>Escolher meus 3 lutadores</b><span>A ordem em que você toca é a ordem de entrada</span></button>
+  <button class="btn" id="cl-start"><b>Iniciar campeonato</b><span>Só o organizador inicia</span></button>
+  <p class="muted" id="cl-wait"></p>
+  <button class="btn sm" id="cl-exit">Sair do campeonato</button>
+</div></div>
+
+<!-- CAMPEONATO: TABELA -->
+<div id="s-ctable" class="screen"><div class="wrap">
+  <h2>CAMPEONATO</h2>
+  <button class="btn" id="ct-live" style="display:none"><b>Assistir a luta ao vivo</b><span>Abre a luta que está rolando</span></button>
+  <div id="ct-body" style="display:flex;flex-direction:column;gap:12px"></div>
+  <button class="btn sm" id="ct-exit">Sair do campeonato</button>
+</div></div>
+
 <!-- SELEÇÃO -->
 <div id="s-select" class="screen"><div class="wrap">
   <div class="step" id="sel-step">JOGADOR 1</div>
@@ -197,6 +251,9 @@ p{margin:0}
   </div>
   <button id="padtog">Controles</button>
   <button id="quit">Sair</button>
+  <button id="ctab">Tabela</button>
+  <div id="cmsg"></div>
+  <div id="cres"><div class="box"><h2 id="cres-t"></h2><p id="cres-s" class="muted"></p></div></div>
   <div id="end"><div class="box"><h2 id="end-t">VENCEDOR</h2><p id="end-s" class="muted"></p>
     <button class="btn main" id="end-re"><b>Jogar de novo</b></button><button class="btn" id="end-menu"><b>Menu</b></button></div></div>
 </div>
