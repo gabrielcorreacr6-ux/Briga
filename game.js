@@ -219,7 +219,7 @@ const RUN={
  jamaisnov(G,p,e){const sa=p.sa;p.sa=0;lock(e,3.1,'zap');lock(p,3.1,'finger');p.sa=sa;p.ns=true;G.fx.push({t:'storm',o:p.i,v:e.i,age:0,dur:3,n:7,done:0,dmg:14,t0:.8})},
  subtransf(G,p,e){lock(p,2.4,'st1');p.sa=2.5;p.ns=true;p.tf=22.4;e.atk=null;e.cast=null;e.stun=Math.max(e.stun,2.5);e.dash=null;e.ns=true;G.fx.push({t:'subtr',o:p.i,v:e.i,age:0,dur:2.4});txt(G,p.x,p.y+90,'NATAL NA SEXTA-FEIRA?','#ffe84a')},
  submao2(G,p,e){lock(p,1.8,'sm2');p.sa=1.85;p.ns=true;G.fx.push({t:'sub2',o:p.i,v:e.i,age:0,dur:1.8,x0:p.x+p.face*30,x1:e.x,dir:p.face,h1:false,tp:false});txt(G,p.x,p.y+90,'ATESTADO SEGUNDA-FEIRA','#ff9aff')},
- reytransf(G,p,e){lock(p,2.5,'tf1');p.tf=27.5;p.sa=2.6;p.inv=2.6;p.ns=true;G.fx.push({t:'transf',o:p.i,age:0,dur:2.5,ph:0});txt(G,p.x,p.y+90,'MAIS UM ATESTADO?','#d7a8ff')},
+ reytransf(G,p,e){lock(p,2.5,'tf1');p.tf=27.5;p.lv=0;p.sa=2.6;p.inv=2.6;p.ns=true;G.fx.push({t:'transf',o:p.i,age:0,dur:2.5,ph:0});txt(G,p.x,p.y+90,'MAIS UM ATESTADO?','#d7a8ff')},
  copo(G,p,e){G.fx.push({t:'copo',o:p.i,v:e.i,age:0,dur:1,st:0,x0:p.x})},
  troco(G,p,e){p.hide=true;lock(p,1.1,'slide');p.ns=true;G.fx.push({t:'troco',o:p.i,v:e.i,age:0,dur:1.2,hitAt:.45,dmg:78,did:false,x0:p.x,dir:e.x>=p.x?1:-1})},
  bar(G,p,e){lock(e,3.5,'burn');G.fx.push({t:'bar',o:p.i,v:e.i,age:0,dur:3.5,ticks:8,done:0,dmg:95/8})},
@@ -256,7 +256,8 @@ function stepF(G,i,inp,dt){
  if(p.wet>0)p.wet=Math.max(0,p.wet-dt);if(p.paint>0)p.paint=Math.max(0,p.paint-dt);if(p.rng>0)p.rng=Math.max(0,p.rng-dt);if(p.mw>0)p.mw=Math.max(0,p.mw-dt);
  if(p.stacks>0){p.stackT-=dt;if(p.stackT<=0)p.stacks=0}
  if(p.stun<=0&&p.pose&&!(p.cast&&p.cast.fired&&p.pose==='sit'))p.pose='';
- if(p.tf>0){p.tf-=dt;if(p.tf<=0){p.tf=0;txt(G,p.x,p.y+84,'FORMA ACABOU','#d7a8ff');if(p.ch==='subaz')p.cd=Math.max(p.cd,CH.subaz.sk.cd)}}
+ if(p.ch==='reymond'&&p.tf>0&&p.tf<=25){const el=25-p.tf,lv=el<8?1:el<16?2:3;if(lv>(p.lv|0)){p.lv=lv;if(lv>1){txt(G,p.x,p.y+92,'FÚRIA NÍVEL '+lv+' ('+(lv===2?15:20)+'%)',lv===2?'#ff8ae0':'#ff5a5a');G.fx.push({t:'ring',x:p.x,age:0,dur:.6,col:lv===2?'#ff8ae0':'#ff5a5a'});G.shake=Math.max(G.shake,6)}}}
+ if(p.tf>0){p.tf-=dt;if(p.tf<=0){p.tf=0;p.lv=0;txt(G,p.x,p.y+84,'FORMA ACABOU','#d7a8ff');if(p.ch==='subaz')p.cd=Math.max(p.cd,CH.subaz.sk.cd)}}
  if(p.inv>0)p.inv-=dt;if(p.sa>0)p.sa-=dt;
  if(p.spk>0){p.spk-=dt;p.spkAcc+=dt;while(p.spkAcc>=.4){p.spkAcc-=.4;dealHit(G,p.spkBy,i,.025*CH[p.ch].spec*BASIC_SCALE/3,{kind:'dot'});if(G.phase!=='fight')return}if(p.spk<=0)p.spkAcc=0}
  if(p.burn>0){p.burn-=dt;p.burnAcc+=dt;while(p.burnAcc>=1){p.burnAcc-=1;dealHit(G,p.burnBy,i,p.burnDps,{kind:'dot'});if(G.phase!=='fight')return}}
@@ -338,9 +339,10 @@ function doAttack(G,p,e,k){
   else{const x1=e.x;G.fx.push({t:'sublin',o:p.i,v:e.i,age:0,dur:1.0,x0:p.x+p.face*30,x1,dir:p.face,n:6,did:false})}
   return}
  if(p.ch==='reymond'&&p.tf>0){
-  const d=Math.max(1,.10*e.hp);
-  if(k==='l'){G.fx.push({t:'rbeam',o:p.i,v:e.i,age:0,dur:.5,dir:p.face,x0:p.x});if(front&&Math.abs(e.y-p.y)<70)dealHit(G,p.i,e.i,d,{kind:'proj',stun:.35,kb:p.face*160,k})}
-  else{G.fx.push({t:'torn',o:p.i,v:e.i,age:0,dur:.9,x:e.x});dealHit(G,p.i,e.i,d,{kind:'special',stun:1.1,kb:0,k});e.vy=380;G.shake=Math.max(G.shake,8)}
+  const el=25-p.tf,pc=el<8?.10:el<16?.15:.20,d=Math.max(1,pc*e.hp);
+  const heal=(bl)=>{if(p.ko)return;const h=.10*MAXHP*(bl?.5:1);p.hp=Math.min(MAXHP,p.hp+h);txt(G,p.x,p.y+84,'+'+Math.round(h),'#6bff9a')};
+  if(k==='l'){G.fx.push({t:'rbeam',o:p.i,v:e.i,age:0,dur:.5,dir:p.face,x0:p.x});if(front&&Math.abs(e.y-p.y)<70){const bl=!!e.blk;const ok=dealHit(G,p.i,e.i,d,{kind:'proj',stun:.35,kb:p.face*160,k});if(ok)heal(bl)}}
+  else{G.fx.push({t:'torn',o:p.i,v:e.i,age:0,dur:.9,x:e.x});const ok=dealHit(G,p.i,e.i,d,{kind:'special',stun:1.1,kb:0,k});if(ok)heal(false);e.vy=380;G.shake=Math.max(G.shake,8)}
   return}
  if(p.ch==='kbene'){
   if(Math.abs(dx)<=82&&close&&front){
@@ -669,6 +671,9 @@ function drawSpriteFighter(c2,p,t,gy,sc){
   for(let q=-2;q<=2;q++){const h=dh*.5+Math.sin(t*9+q*1.7)*8;c2.fillRect(q*7-3,-h-12,6,h+12)}
   c2.restore();
   const tt=tinted(p.ch,col);for(const [ox,oy] of [[-2,0],[2,0],[0,-2],[0,2]])draw(tt,.75*ga,ox,oy);
+ }
+ if(p.ch==='reymond'&&p.tf>0&&(p.lv|0)>=2&&!p.ko){
+  const pl=.7+.3*Math.sin(t*12),ta=tinted(p.ch,(p.lv|0)>=3?'#ff3a3a':'#ff6ad8');for(const [ox,oy] of [[-3,0],[3,0],[0,-3],[0,3]])draw(ta,.7*pl*ga,ox,oy);
  }
  if(p.ch==='kabo'&&p.thin>0&&!p.ko){
   const pl=.75+.25*Math.sin(t*10);
