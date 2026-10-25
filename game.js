@@ -86,7 +86,7 @@ const CH={
   sk:{name:'JAMAIS SERÁS',cd:12,close:null,wind:.35,rec:.5,run:'jamais'},
   sp:{name:'NUNCA SERÁS',wind:.6,rec:.6,run:'nunca',col:'#9ad8ff'},
   se:{name:'JAMAIS SERÁS NOVAMENTE',wind:.7,rec:.6,run:'jamaisnov',col:'#c8f5ff'},
-  info:{style:'Lutador elétrico, golpes rápidos. Cada golpe deixa faíscas no inimigo: +2,5% de dano extra em 1,2s (renova a cada golpe).',skill:'<b>JAMAIS SERÁS</b>: raio pelo chão que vai até o inimigo de qualquer distância (37%).',sp:'<b>NUNCA SERÁS</b>: puxa o inimigo (46%) e o repele com um escudo elétrico (45%).',se:'<b>JAMAIS SERÁS NOVAMENTE</b>: levanta o dedo e uma tempestade de raios cai sobre o inimigo (98%).',def:'Defende de guarda.'}},
+  info:{style:'Lutador elétrico, golpes rápidos. Cada golpe deixa faíscas no inimigo: +2,5% de dano extra em 1,2s (renova a cada golpe).',skill:'<b>JAMAIS SERÁS</b>: raio pelo chão que vai até o inimigo de qualquer distância (55%).',sp:'<b>NUNCA SERÁS</b>: puxa o inimigo (46%) e o repele com um escudo elétrico (45%).',se:'<b>JAMAIS SERÁS NOVAMENTE</b>: levanta o dedo e uma tempestade de raios cai sobre o inimigo (98%). Não pode ser interrompido e ele fica 2s sem poder morrer.',def:'Defende de guarda.'}},
 };
 const ORDER=['subaz','reymond','dpaul','moraes','kabo','kbene','jota','jorge','hered','vald','berri'];
 const EXTRA={girl:{pal:{skin:'#d9a07a',hair:'#3a1f2a',hairT:'bleach',up:'#ff6ac0',lo:'#c04aa0',str:'#fff',str2:'#fff',pants:'#5a3a8a',boots:'#222'},bw:.9},
@@ -94,7 +94,7 @@ const EXTRA={girl:{pal:{skin:'#d9a07a',hair:'#3a1f2a',hairT:'bleach',up:'#ff6ac0
 const SKIN=['#b57a52','#8a5a3a','#d9a07a','#6a4430'];
 
 /* ============ ESTADO ============ */
-function newF(i,ch){return {i,ch,x:i?340:140,y:0,vx:0,vy:0,kv:0,face:i?-1:1,hp:MAXHP,en:START_EN,st:'idle',walk:0,atk:null,cast:null,leap:null,cd:0,stun:0,slow:0,burn:0,burnDps:0,burnAcc:0,burnCol:'#ff7a1a',burnBy:0,spk:0,spkAcc:0,spkBy:0,hits:0,stacks:0,stackT:0,thin:0,cl:0,rage:0,away:false,awayDir:1,blk:false,flash:0,ko:false,pose:'',secOn:false,secSeen:false}}
+function newF(i,ch){return {i,ch,x:i?340:140,y:0,vx:0,vy:0,kv:0,face:i?-1:1,hp:MAXHP,en:START_EN,st:'idle',walk:0,atk:null,cast:null,leap:null,cd:0,stun:0,slow:0,burn:0,burnDps:0,burnAcc:0,burnCol:'#ff7a1a',burnBy:0,inv:0,sa:0,spk:0,spkAcc:0,spkBy:0,hits:0,stacks:0,stackT:0,thin:0,cl:0,rage:0,away:false,awayDir:1,blk:false,flash:0,ko:false,pose:'',secOn:false,secSeen:false}}
 function newGame(chars){
  const G={chars:chars.slice(),p:[newF(0,chars[0]),newF(1,chars[1])],proj:[],fx:[],hf:[],txt:[],banner:null,phase:'intro',pt:0,round:1,wins:[0,0],timer:ROUND_TIME,shake:0,dim:0,ev:[],evn:0,winner:-2,rw:-1,f2:false,tick:0};
  G.banner={txt:'ROUND 1',sub:'',col:'#ffd84a',t:0,dur:1.1};
@@ -120,7 +120,7 @@ function basicDmg(p,e,k){
  return Math.max(.8,d);
 }
 function burn(T,by,dps,dur,col){T.burn=dur;T.burnDps=dps;T.burnCol=col;T.burnBy=by;T.burnAcc=0}
-function lock(V,t,pose){V.stun=Math.max(V.stun,t);V.atk=null;V.leap=null;V.dash=null;if(V.cast&&V.cast.d.skill&&!V.cast.fired)V.cast=null;if(pose)V.pose=pose}
+function lock(V,t,pose){if(V.sa>0)return;V.stun=Math.max(V.stun,t);V.atk=null;V.leap=null;V.dash=null;if(V.cast&&V.cast.d.skill&&!V.cast.fired)V.cast=null;if(pose)V.pose=pose}
 function dealHit(G,a,v,dmg,o){
  const A=G.p[a],V=G.p[v];
  if(G.phase!=='fight'||V.ko||V.away)return false;
@@ -139,11 +139,11 @@ function dealHit(G,a,v,dmg,o){
   }
  }
  if(V.rage>0)dmg*=1.25;
- V.hp=Math.max(0,V.hp-dmg);V.flash=.14;
+ V.hp=Math.max(V.inv>0?1:0,V.hp-dmg);V.flash=.14;
  if(!blocked&&kind!=='dot'&&A.ch!=='kbene'&&!A.ko){const hl=LIFESTEAL*MAXHP;A.hp=Math.min(MAXHP,A.hp+hl);txt(G,A.x,A.y+76,'+'+Math.round(hl),'#6bff9a')}
  txt(G,V.x+rnd(-6,6),V.y+66,fmt(dmg),blocked?'#9ad':(kind==='special'||kind==='skill')?'#ffd84a':'#fff');
  if(kind!=='dot'&&kind!=='special'){A.en=Math.min(100,A.en+7);V.en=Math.min(100,V.en+5)}
- if(!blocked){
+ if(!blocked&&!(V.sa>0)){
   if(o.stun)lock(V,o.stun);
   else if(kind==='basic'||kind==='proj'){lock(V,o.k==='h'?.3:.14);V.kv=A.face*(o.k==='h'?240:130)}
   if(o.kb)V.kv=A.face*o.kb;
@@ -212,7 +212,7 @@ const RUN={
  padaria(G,p,e){padStart(G,p,e,'jorge','table',87,1.6)},
  jamais(G,p,e){lock(p,.95,'crouch');p.ns=true;G.fx.push({t:'jam',o:p.i,v:e.i,age:0,dur:.9,x:p.x,dir:e.x>=p.x?1:-1,did:false})},
  nunca(G,p,e){lock(e,1.5,'held');lock(p,1.1,'shield');p.ns=true;e.face=p.x>=e.x?1:-1;G.fx.push({t:'nun',o:p.i,v:e.i,age:0,dur:1.3,st:0})},
- jamaisnov(G,p,e){lock(e,3.1,'zap');lock(p,3.1,'finger');p.ns=true;G.fx.push({t:'storm',o:p.i,v:e.i,age:0,dur:3,n:7,done:0,dmg:14,t0:.8})},
+ jamaisnov(G,p,e){const sa=p.sa;p.sa=0;lock(e,3.1,'zap');lock(p,3.1,'finger');p.sa=sa;p.ns=true;G.fx.push({t:'storm',o:p.i,v:e.i,age:0,dur:3,n:7,done:0,dmg:14,t0:.8})},
  copo(G,p,e){G.fx.push({t:'copo',o:p.i,v:e.i,age:0,dur:1,st:0,x0:p.x})},
  troco(G,p,e){p.hide=true;lock(p,1.1,'slide');p.ns=true;G.fx.push({t:'troco',o:p.i,v:e.i,age:0,dur:1.2,hitAt:.45,dmg:78,did:false,x0:p.x,dir:e.x>=p.x?1:-1})},
  bar(G,p,e){lock(e,3.5,'burn');G.fx.push({t:'bar',o:p.i,v:e.i,age:0,dur:3.5,ticks:8,done:0,dmg:95/8})},
@@ -232,7 +232,7 @@ function startCast(G,p,e,which){
   p.cd=sk.cd;p.cast={d:sk,t:0,fired:false};txt(G,p.x,p.y+78,sk.name,'#ffd84a');ev(G,'skill');ev(G,'v_'+p.ch+'_skill');
  }else{
   const d=which==='secret'?c.se:c.sp;
-  p.en=0;p.cast={d,t:0,fired:false};G.dim=1;
+  p.en=0;p.cast={d,t:0,fired:false};G.dim=1;if(p.ch==='berri'&&which==='secret'){p.inv=2;p.sa=3.9}
   G.banner={txt:d.name,sub:c.short,col:d.col,t:0,dur:1.4};ev(G,'special');ev(G,'v_'+p.ch+'_'+(which==='secret'?'secret':'special'));
  }
 }
@@ -249,6 +249,7 @@ function stepF(G,i,inp,dt){
  if(p.wet>0)p.wet=Math.max(0,p.wet-dt);if(p.paint>0)p.paint=Math.max(0,p.paint-dt);if(p.rng>0)p.rng=Math.max(0,p.rng-dt);if(p.mw>0)p.mw=Math.max(0,p.mw-dt);
  if(p.stacks>0){p.stackT-=dt;if(p.stackT<=0)p.stacks=0}
  if(p.stun<=0&&p.pose&&!(p.cast&&p.cast.fired&&p.pose==='sit'))p.pose='';
+ if(p.inv>0)p.inv-=dt;if(p.sa>0)p.sa-=dt;
  if(p.spk>0){p.spk-=dt;p.spkAcc+=dt;while(p.spkAcc>=.4){p.spkAcc-=.4;dealHit(G,p.spkBy,i,.025*CH[p.ch].spec*BASIC_SCALE/3,{kind:'dot'});if(G.phase!=='fight')return}if(p.spk<=0)p.spkAcc=0}
  if(p.burn>0){p.burn-=dt;p.burnAcc+=dt;while(p.burnAcc>=1){p.burnAcc-=1;dealHit(G,p.burnBy,i,p.burnDps,{kind:'dot'});if(G.phase!=='fight')return}}
  if(fight)p.en=Math.min(100,p.en+1.2*dt);
@@ -400,7 +401,7 @@ function updFx(G,dt){
     break}
    case 'jam':{
     const P=G.p[f.o];f.x+=f.dir*620*dt;
-    if(!f.did&&((f.dir>0&&f.x>=V.x)||(f.dir<0&&f.x<=V.x))){f.did=true;f.ha=f.age;if(V.y<60){dealHit(G,f.o,V.i,37,{kind:'skill',stun:1.2,kb:f.dir*200});V.pose='zap';G.shake=Math.max(G.shake,7)}}
+    if(!f.did&&((f.dir>0&&f.x>=V.x)||(f.dir<0&&f.x<=V.x))){f.did=true;f.ha=f.age;if(V.y<60){dealHit(G,f.o,V.i,55,{kind:'skill',stun:1.2,kb:f.dir*200});V.pose='zap';G.shake=Math.max(G.shake,7)}}
     if(f.age>=f.dur)f.dead=true;
     if(f.did&&f.age>=f.dur-.3)f.dead=true;
     break}
