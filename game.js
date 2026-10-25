@@ -922,7 +922,7 @@ function drawFx(c2,f,G,t){
    const a=Math.min(P.x,f.x),b=Math.max(P.x,f.x);c2.globalAlpha=Math.max(.2,1-(f.age>.5?(f.age-.5)/.4:0));
    for(let k=0;k<3;k++){c2.fillStyle=k?'#c8f5ff':'#2a8aff';let x=a,y=GY-1-k;while(x<b){const nx=Math.min(b,x+7+((x*13|0)%5));const ny=GY-2-((Math.sin(t*40+x*.7+k)*5+5)|0)*(k?.6:1);c2.fillRect(x,Math.min(y,ny)-1,nx-x+1,Math.abs(ny-y)+(k?1:3));x=nx;y=ny}}
    if(!f.did)drawFrameAt(c2,'berri',13,f.x,GY,f.dir,.9);
-   else{const q=Math.min(1,(f.age-f.ha)/.35);drawFrameAt(c2,'berri',14,V.x-f.dir*18,GY,f.dir,Math.max(0,1-q));for(let k=0;k<4;k++)F(V.x-8+k*5,GY-V.y-10-(k*9%30),2,18,'#ffffff')}
+   else{for(let k=0;k<4;k++)F(V.x-8+k*5,GY-V.y-10-(k*9%30),2,18,'#ffffff')}
    c2.globalAlpha=1;break}
   case 'nun':{const P=G.p[f.o];
    const my=GY-P.y-38;
