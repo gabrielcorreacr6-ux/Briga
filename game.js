@@ -93,7 +93,7 @@ const CH={
   sk:{name:'SOM DE CHUVA',cd:14,close:null,wind:.3,rec:.5,run:'temporal',skill:1},
   sp:{name:'SOLVENTE E ISQUEIRO',wind:.35,rec:.5,run:'solvente',col:'#ff9a3a'},
   se:{name:'ALUCINAÇÃO',wind:.5,rec:.5,run:'alucina',col:'#6aff7a'},
-  info:{style:'Corpo a corpo, ataque rápido. Bate com a lata de solvente e a lata de tinta amarela: cada golpe pinta o inimigo e dá +2% de dano extra por 3s (renova a cada golpe).',skill:'<b>SOM DE CHUVA</b>: larga as latas no chão e põe o celular no ouvido; um temporal alaga o campo, empurra o inimigo com a correnteza e o deixa lento por 4s (60%).',sp:'<b>SOLVENTE E ISQUEIRO</b>: joga a lata de solvente no inimigo, molha tudo e joga o isqueiro: explosão de fogo (81%).',se:'<b>ALUCINAÇÃO</b>: senta nas latas e delira, a tela fica verde e um vulto amarelo de tinta ataca o inimigo com 5 golpes de 25% (125%). Não pode ser interrompido.',def:'Defende de guarda.'}},
+  info:{style:'Corpo a corpo, ataque rápido. Bate com a lata de solvente e a lata de tinta amarela: cada golpe pinta o inimigo e dá +2% de dano extra por 3s (renova a cada golpe).',skill:'<b>SOM DE CHUVA</b>: larga as latas no chão e põe o celular no ouvido; um temporal alaga o campo, empurra o inimigo com a correnteza e o deixa lento por 4s (69%).',sp:'<b>SOLVENTE E ISQUEIRO</b>: joga a lata de solvente no inimigo, molha tudo e joga o isqueiro: explosão de fogo (81%).',se:'<b>ALUCINAÇÃO</b>: senta nas latas e delira, a tela fica verde e um vulto amarelo de tinta ataca o inimigo com 5 golpes de 25% (125%) e rouba 25% do dano em vida. Não pode ser interrompido.',def:'Defende de guarda.'}},
 };
 const ORDER=['subaz','reymond','dpaul','moraes','kabo','kbene','jota','jorge','hered','vald','berri','brisa'];
 const EXTRA={girl:{pal:{skin:'#d9a07a',hair:'#3a1f2a',hairT:'bleach',up:'#ff6ac0',lo:'#c04aa0',str:'#fff',str2:'#fff',pants:'#5a3a8a',boots:'#222'},bw:.9},
@@ -123,6 +123,7 @@ function basicDmg(p,e,k){
  if(p.ch==='jorge'){if(p.js>0)d*=1+.05*p.js;if(p.fire)d*=2}
  if(p.ch==='hered'&&e.wet>0)d+=0.04*CH[e.ch].spec*BASIC_SCALE;
  if(k==='h')d*=HEAVY_MULT;
+ if(p.ch==='brisa')d*=1.05;
  if(p.ch==='kabo'&&p.thin>0)d=.15*e.hp;
  return Math.max(.8,d);
 }
@@ -236,7 +237,7 @@ const RUN={
  bar(G,p,e){lock(e,3.5,'burn');G.fx.push({t:'bar',o:p.i,v:e.i,age:0,dur:3.5,ticks:8,done:0,dmg:95/8})},
  chuveiro(G,p,e){padStart(G,p,e,'vald','shower',40,1.4)},
  bone(G,p,e){G.proj.push({o:p.i,k:'cap',x:p.x+p.face*20,y:p.y+36,vx:p.face*470,dmg:20,age:0,kind:'special',stun:1.6,kb:100,big:1,hideOwner:1,then:{t:'upper',dur:1,hitAt:.6,dmg:60,did:false}})},
- temporal(G,p,e){lock(p,4.4,'rn1');p.sa=2.6;p.ns=true;p.face=e.x>=p.x?1:-1;G.fx.push({t:'rain',o:p.i,v:e.i,age:0,dur:4.4,hitAt:2.5,dmg:60,did:false,dir:e.x>=p.x?1:-1,x:p.x});txt(G,p.x,p.y+90,'SOM DE CHUVA...','#9ad8ff')},
+ temporal(G,p,e){lock(p,4.4,'rn1');p.sa=2.6;p.ns=true;p.face=e.x>=p.x?1:-1;G.fx.push({t:'rain',o:p.i,v:e.i,age:0,dur:4.4,hitAt:2.5,dmg:69,did:false,dir:e.x>=p.x?1:-1,x:p.x});txt(G,p.x,p.y+90,'SOM DE CHUVA...','#9ad8ff')},
  solvente(G,p,e){lock(p,3.3,'sv1');p.sa=3.4;p.ns=true;p.face=e.x>=p.x?1:-1;G.fx.push({t:'solv',o:p.i,v:e.i,age:0,dur:3.4,dmg:81,st:0,dir:e.x>=p.x?1:-1,x:p.x,fx:p.x})},
  alucina(G,p,e){lock(e,4.1,'');e.atk=null;e.cast=null;e.dash=null;lock(p,4.2,'hz1');p.sa=4.3;p.ns=true;p.face=e.x>=p.x?1:-1;G.fx.push({t:'aluc',o:p.i,v:e.i,age:0,dur:4.2,n:5,done:0,dmg:25,t0:1.0,gap:.55,dir:e.x>=p.x?1:-1,ph:0});txt(G,p.x,p.y+90,'ALUCINAÇÃO...','#6aff7a')},
  atrasado(G,p,e){lock(e,3.6,'');lock(p,3.4,'');p.ns=true;G.fx.push({t:'time',o:p.i,v:e.i,age:0,dur:3.2,n:8,done:0,dmg:90/8,side:1,tr:[],t0:.4,gap:.3})},
@@ -522,7 +523,7 @@ function updFx(G,dt){
     const P=G.p[f.o],a=f.age;
     P.pose=a<.7?'hz1':a<1.2?'hz2':a<1.9?'hz3':a<2.6?'hz4':'hz5';
     V.stun=Math.max(V.stun,.2);
-    if(f.done<f.n&&a>=f.t0+f.done*f.gap){f.done++;const last=f.done===f.n;if(!V.ko&&!V.away){dealHit(G,f.o,V.i,f.dmg,{kind:'special',stun:.8,kb:f.dir*(last?260:60)});if(last)V.vy=300;V.pose='zap'}hfx(G,V.x+rnd(-8,8),V.y+rnd(20,60),'#ffe21a',1);G.shake=Math.max(G.shake,last?12:6)}
+    if(f.done<f.n&&a>=f.t0+f.done*f.gap){f.done++;const last=f.done===f.n;if(!V.ko&&!V.away){dealHit(G,f.o,V.i,f.dmg,{kind:'special',stun:.8,kb:f.dir*(last?260:60)});if(last)V.vy=300;V.pose='zap';if(!P.ko){const h=.25*f.dmg;P.hp=Math.min(MAXHP,P.hp+h);txt(G,P.x,P.y+84,'+'+Math.round(h),'#6bff9a')}}hfx(G,V.x+rnd(-8,8),V.y+rnd(20,60),'#ffe21a',1);G.shake=Math.max(G.shake,last?12:6)}
     if(a>=f.dur||P.ko||V.ko){P.pose='';P.ns=false;P.sa=0;if(!P.ko)P.stun=0;V.ns=false;if(!V.ko)V.stun=0;f.dead=true}
     break}
    case 'time':{
@@ -1559,7 +1560,7 @@ function padState(){
 /* ============ REDE (WebRTC manual) ============ */
 const Net={pc:null,dc:null,open:false,role:null,
  send(o){if(this.dc&&this.dc.readyState==='open'){try{this.dc.send(JSON.stringify(o))}catch(e){}}},
- close(){try{this.dc&&this.dc.close()}catch(e){}try{this.pc&&this.pc.close()}catch(e){}this.dc=null;this.pc=null;this.open=false;this.role=null}};
+ close(){const rl=this.dc&&this.dc.relay;try{this.dc&&this.dc.close()}catch(e){}try{this.pc&&this.pc.close()}catch(e){}this.dc=null;this.pc=null;this.open=false;this.role=null;if(rl)Sig.close()}};
 const RTC_CFG={iceCandidatePoolSize:2,iceServers:[{urls:['stun:stun.l.google.com:19302','stun:stun1.l.google.com:19302','stun:stun2.l.google.com:19302','stun:stun.cloudflare.com:3478','stun:global.stun.twilio.com:3478']},{urls:['turn:openrelay.metered.ca:80','turn:openrelay.metered.ca:443','turn:openrelay.metered.ca:443?transport=tcp','turns:openrelay.metered.ca:443?transport=tcp'],username:'openrelayproject',credential:'openrelayproject'}]};
 /* Relé TURN opcional (serviço gratuito Metered): defina TURN_API com a URL de credenciais para ativar */
 const TURN_API='';
@@ -1718,10 +1719,12 @@ function TrMQTT(url){
 }
 const MQTT_URLS=()=>window.MQTT_URLS||['wss://broker.emqx.io:8084/mqtt','wss://broker.hivemq.com:8884/mqtt','wss://test.mosquitto.org:8081/mqtt'];
 /* Sig: abre vários serviços ao mesmo tempo; a mensagem vai por todos e duplicatas são descartadas */
-const Sig={T:[],seen:new Set(),exp:{},onmsg:null,last:'',
+const Sig={T:[],seen:new Set(),exp:{},rly:{},onmsg:null,last:'',
  get ws(){return{readyState:this.T.some(t=>t.up)?1:3}},
- close(){this.T.forEach(t=>{try{t.close()}catch(e){}});this.T=[];this.seen.clear();this.exp={}},
+ close(){this.T.forEach(t=>{try{t.close()}catch(e){}});this.T=[];this.seen.clear();this.exp={};this.rly={}},
+ sendRly(dst,s){const t=this.T.find(x=>x.up&&x.name==='mqtt');if(t)t.send({type:'RLY',dst,payload:{d:s}})},
  dispatch(t,m){
+  if(m.type==='RLY'){const f=this.rly[m.src];if(f&&m.payload)f(m.payload.d);return}
   if(m.type==='EXPIRE'||m.type==='LEAVE'){
    const k=m.src||'?';(this.exp[k]=this.exp[k]||new Set()).add(t.name+(t.url||''));
    if(!this.T.filter(x=>x.up).every(x=>this.exp[k].has(x.name+(x.url||''))))return;
@@ -1736,6 +1739,24 @@ const Sig={T:[],seen:new Set(),exp:{},onmsg:null,last:'',
  })},
  send(o){const u=Math.random().toString(36).slice(2,10);const m=Object.assign({},o);if(m.payload)m.payload=Object.assign({},m.payload,{u});else if(m.type==='CANDIDATE'||m.type==='OFFER'||m.type==='ANSWER')m.payload={u};this.T.forEach(t=>{if(t.up)t.send(m)})},
  onmsg:null};
+/* Rota alternativa: canal virtual que leva os mesmos dados pelo servidor MQTT quando a conexão direta (WebRTC) não fecha */
+function RelayDC(peer){
+ const d={readyState:'open',bufferedAmount:0,onmessage:null,onclose:null,onopen:null,peer,q:{},tm:null,relay:true,rx:Date.now(),ka:null,
+  flush(){clearTimeout(d.tm);d.tm=null;const q=d.q;d.q={};for(const k of ['m','st','in'])if(q[k])Sig.sendRly(peer,q[k])},
+  send(s){
+   if(d.readyState!=='open')return;
+   const k=s.startsWith('{"k":"st"')?'st':s.startsWith('{"k":"m"')?'m':s.startsWith('{"k":"in"')?'in':null;
+   if(k){
+    if(k==='in'&&d.q.in){try{const a=JSON.parse(d.q.in),b=JSON.parse(s);b.p=(a.p|0)|(b.p|0);s=JSON.stringify(b)}catch(e){}}
+    d.q[k]=s;if(!d.tm)d.tm=setTimeout(d.flush,k==='in'?30:50);
+   }else{d.flush();Sig.sendRly(peer,s)}
+  },
+  close(){if(d.readyState==='closed')return;clearInterval(d.ka);try{d.flush()}catch(e){}d.readyState='closed';delete Sig.rly[peer];d.onclose&&d.onclose()}};
+ Sig.rly[peer]=s=>{d.rx=Date.now();d.onmessage&&d.onmessage({data:s})};
+ d.ka=setInterval(()=>{d.send('{"k":"ka"}');if(Date.now()-d.rx>16000)d.close()},4000);
+ return d;
+}
+const dummyPC={close(){},addIceCandidate(){return Promise.resolve()}};
 const CODE_CH='ABCDEFGHJKMNPQRSTUVWXYZ';
 const rndCode=()=>Array.from({length:4},()=>CODE_CH[Math.floor(Math.random()*CODE_CH.length)]).join('');
 function sigPC(role,peerId){
@@ -1754,6 +1775,15 @@ $('q-host').onclick=async()=>{
  let cur=null;
  Sig.onmsg=async m=>{
   try{
+   if(m.type==='RLYREQ'){
+    if(Net.open&&!(Net.dc&&Net.dc.relay))return;
+    const src=m.src;
+    if(Net.dc&&Net.dc.relay&&Net.dc.peer===src){Sig.send({type:'RLYOK',dst:src});return}
+    try{cur&&cur.pc.close()}catch(e){}
+    Net.role='host';const rdc=RelayDC(src);setupDC(rdc);
+    Sig.send({type:'RLYOK',dst:src});
+    setStatus('Amigo encontrado pela rota alternativa.');rdc.onopen&&rdc.onopen();
+    return}
    if(m.type==='OFFER'){
     if(Net.open)return;
     cur=sigPC('host','bdfg-'+(m.src||'').replace(/^bdfg-/,''));const src=m.src;
@@ -1780,8 +1810,12 @@ $('q-go').onclick=async()=>{
   const S=sigPC('guest',host);const pc=S.pc;
   let found=false;
   const dc=pc.createDataChannel('g');setupDC(dc);const o=dc.onopen;dc.onopen=()=>{found=true;Sig.close();o&&o()};
+  let rlyT=null;
   Sig.onmsg=async m=>{
    try{
+    if(m.type==='RLYOK'){
+     if(Net.open||!rlyT)return;clearInterval(rlyT);rlyT=null;
+     const rdc=RelayDC(host);setupDC(rdc);Net.role='guest';found=true;setStatus('Conectado pela rota alternativa.','ok');rdc.onopen&&rdc.onopen();return}
     if(m.type==='ANSWER'){found=true;setStatus('Sala encontrada, conectando...');await S.setRemote(m.payload.sdp)}
     else if(m.type==='CANDIDATE'&&m.payload&&m.payload.candidate)S.addCand(m.payload.candidate);
     else if(m.type==='EXPIRE'||m.type==='LEAVE'){if(!found)setStatus('Sala não encontrada. Confira o código.','err')}
@@ -1789,7 +1823,13 @@ $('q-go').onclick=async()=>{
   };
   await pc.setLocalDescription(await pc.createOffer());
   Sig.send({type:'OFFER',dst:host,payload:{sdp:{type:pc.localDescription.type,sdp:pc.localDescription.sdp}}});
-  setTimeout(()=>{if(!Net.open&&!found)setStatus('Sala não encontrada. Confira o código.','err')},12000);
+  setTimeout(()=>{
+   if(Net.open||rlyT)return;
+   try{pc.close()}catch(e){}
+   setStatus('Conexão direta lenta. Tentando a rota alternativa...');
+   const req=()=>Sig.send({type:'RLYREQ',dst:host});req();let n=0;
+   rlyT=setInterval(()=>{if(Net.open||++n>5){clearInterval(rlyT);if(!Net.open){rlyT=null;setStatus(found?'Falhou: a rede bloqueou a conexão direta e a rota alternativa não respondeu. Tente de novo.':'Sala não encontrada. Confira o código.','err')}return}req()},2000);
+  },8000);
  }catch(e){setStatus('Não foi possível entrar: '+e.message,'err')}
 };
 $('o-back').addEventListener('click',()=>{Sig.close()});
@@ -1921,6 +1961,15 @@ function bcastT(){if(!C.hub||!CT)return;CT.seq++;hubBcast({k:'T',t:CT});uiT()}
 /* ---------- organizador: sinalização e conexões ---------- */
 async function hubOnSig(m){
  try{
+  if(m.type==='RLYREQ'){
+   const src=m.src;if(!src)return;
+   const old=C.pend[src];
+   if(old&&old.dc&&old.dc.relay){Sig.send({type:'RLYOK',dst:src});return}
+   if(old){try{old.pc.close()}catch(e){}}
+   const rec={pc:dummyPC,dc:null,slot:-1,last:nowMs(),q:[],rd:true,src,watch:0,bye:false};C.pend[src]=rec;
+   const rdc=RelayDC(src);rec.dc=rdc;
+   rdc.onmessage=ev=>{let j;try{j=JSON.parse(ev.data)}catch(_){return}hubMsg(rec,j)};rdc.onclose=()=>hubDrop(rec);
+   Sig.send({type:'RLYOK',dst:src});return}
   if(m.type==='OFFER'){
    const src=m.src;if(!src)return;const old=C.pend[src];if(old){try{old.pc.close()}catch(e){}}
    const pc=mkPC(cStatus),rec={pc,dc:null,slot:-1,last:nowMs(),q:[],rd:false,src,watch:0,bye:false};C.pend[src]=rec;
@@ -1961,6 +2010,7 @@ function hubMsg(rec,m){
 }
 function hubDrop(rec){
  try{rec.pc.close()}catch(e){}
+ try{if(rec.dc&&rec.dc.relay)rec.dc.close()}catch(e){}
  if(C.pend[rec.src]===rec)delete C.pend[rec.src];
  const s=rec.slot;if(s>=0&&C.conns[s]===rec){delete C.conns[s];if(CT.pl[s]){CT.pl[s].on=false;if(rec.bye&&CT.phase==='lobby'){/* saiu de vez: remove da sala */CT.pl.splice(s,1);rebuildConns()}bcastT()}}
 }
@@ -1999,18 +2049,24 @@ async function champJoin(code,ep0,scan){
 function peerJoin(code,ep,tmo){
  return new Promise(async(res,rej)=>{
   const dst=hubId(code,ep),me='bdcg-'+Math.random().toString(36).slice(2,10);
-  let done=false,pc=null,rd=null;const q=[];
-  let to=null;const fail=e=>{if(done)return;done=true;clearTimeout(to);try{pc&&pc.close()}catch(_){}Sig.close();rej(e)};
+  let done=false,pc=null,rd=null,rly=false,rt=null;const q=[];
+  let to=null;const fail=e=>{if(done)return;done=true;clearTimeout(to);clearTimeout(rt);clearInterval(rt);try{pc&&pc.close()}catch(_){}Sig.close();rej(e)};
   try{await Sig.open(me)}catch(e){return fail(e)}
-  if(done)return;to=setTimeout(()=>fail(new Error('timeout')),tmo||12000);
+  if(done)return;to=setTimeout(()=>fail(new Error('timeout')),(tmo||12000)+2500);
   pc=mkPC(cStatus);const dc=pc.createDataChannel('g');
   pc.onicecandidate=e=>{if(e.candidate)Sig.send({type:'CANDIDATE',dst,payload:{candidate:e.candidate.toJSON()}})};
   Sig.onmsg=m=>{try{
-   if(m.type==='ANSWER'){rd=pc.setRemoteDescription(m.payload.sdp).then(()=>{q.splice(0).forEach(c=>pc.addIceCandidate(c).catch(()=>{}))})}
+   if(m.type==='RLYOK'){if(done||!rly)return;done=true;clearTimeout(to);clearInterval(rt);const rdc=RelayDC(dst);res({pc:dummyPC,dc:rdc,relay:true});return}
+   if(m.type==='ANSWER'){if(rly)return;rd=pc.setRemoteDescription(m.payload.sdp).then(()=>{q.splice(0).forEach(c=>pc.addIceCandidate(c).catch(()=>{}))})}
    else if(m.type==='CANDIDATE'&&m.payload&&m.payload.candidate){if(rd)rd.then(()=>pc.addIceCandidate(m.payload.candidate).catch(()=>{}));else q.push(m.payload.candidate)}
    else if(m.type==='EXPIRE'||m.type==='LEAVE')fail(new Error('sem sala'));
   }catch(e){fail(e)}};
-  dc.onopen=()=>{if(done)return;done=true;clearTimeout(to);Sig.close();res({pc,dc})};
+  dc.onopen=()=>{if(done||rly)return;done=true;clearTimeout(to);clearInterval(rt);Sig.close();res({pc,dc})};
+  rt=setTimeout(()=>{
+   if(done)return;rly=true;try{pc.close()}catch(_){}
+   cStatus('Conexão direta lenta. Tentando a rota alternativa...');
+   const req=()=>Sig.send({type:'RLYREQ',dst});req();rt=setInterval(()=>{if(done){clearInterval(rt);return}req()},2000);
+  },Math.max(5000,(tmo||12000)-5000));
   try{await pc.setLocalDescription(await pc.createOffer());Sig.send({type:'OFFER',dst,payload:{sdp:{type:pc.localDescription.type,sdp:pc.localDescription.sdp}}})}catch(e){fail(e)}
  });
 }
