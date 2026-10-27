@@ -87,13 +87,13 @@ const CH={
   sp:{name:'NUNCA SERÁS',wind:.6,rec:.6,run:'nunca',col:'#9ad8ff'},
   se:{name:'JAMAIS SERÁS NOVAMENTE',wind:.7,rec:.6,run:'jamaisnov',col:'#c8f5ff'},
   info:{style:'Lutador elétrico, golpes rápidos. Cada golpe deixa faíscas no inimigo: +2,5% de dano extra em 1,2s (renova a cada golpe).',skill:'<b>JAMAIS SERÁS</b>: raio pelo chão que vai até o inimigo de qualquer distância (55%).',sp:'<b>NUNCA SERÁS</b>: puxa o inimigo (46%) e o repele com um escudo elétrico (45%).',se:'<b>JAMAIS SERÁS NOVAMENTE</b>: levanta o dedo e uma tempestade de raios cai sobre o inimigo (98%). Não pode ser interrompido e ele fica 2s sem poder morrer.',def:'Defende de guarda.'}},
- brisa:{name:"D'Brisa",short:'BRISA',speed:142,jump:320,spec:81,bp:3,atkSpd:1.4,dash:1,bw:1,long:1,
+ brisa:{name:"D'Brisa",short:'BRISA',speed:142,jump:320,spec:81,bp:3,atkSpd:1.6,dash:1,bw:1,long:1,
   pal:{skin:'#b57a52',hair:'#16161a',hairT:'short',up:'#3c423e',lo:'#3c423e',str:'#c8f53c',str2:'#c8f53c',pants:'#3c423e',boots:'#16161a',lan:'#111',glasses:1},
   sec:{up:'#2f6a3a',lo:'#2f6a3a',pants:'#2f6a3a',str:'#e8ff7a',aura:'#6aff7a'},strT:'jk',
   sk:{name:'SOM DE CHUVA',cd:14,close:null,wind:.3,rec:.5,run:'temporal',skill:1},
   sp:{name:'SOLVENTE E ISQUEIRO',wind:.35,rec:.5,run:'solvente',col:'#ff9a3a'},
   se:{name:'ALUCINAÇÃO',wind:.5,rec:.5,run:'alucina',col:'#6aff7a'},
-  info:{style:'Corpo a corpo, ataque rápido. Bate com a lata de solvente e a lata de tinta amarela: cada golpe pinta o inimigo e dá +2% de dano extra por 3s (renova a cada golpe).',skill:'<b>SOM DE CHUVA</b>: larga as latas no chão e põe o celular no ouvido; um temporal alaga o campo, empurra o inimigo com a correnteza e o deixa lento por 4s (69%).',sp:'<b>SOLVENTE E ISQUEIRO</b>: joga a lata de solvente no inimigo, molha tudo e joga o isqueiro: explosão de fogo (81%).',se:'<b>ALUCINAÇÃO</b>: senta nas latas e delira, a tela fica verde e um vulto amarelo de tinta ataca o inimigo com 5 golpes de 25% (125%) e rouba 25% do dano em vida. Não pode ser interrompido.',def:'Defende de guarda.'}},
+  info:{style:'Corpo a corpo, ataque rápido. Bate com a lata de solvente e a lata de tinta amarela: cada golpe tira 7% da vida do inimigo, pinta e dá +2% de dano extra por 3s (renova a cada golpe). Ao usar qualquer habilidade fica invulnerável por 4s e não é interrompido.',skill:'<b>SOM DE CHUVA</b>: larga as latas no chão e põe o celular no ouvido; um temporal alaga o campo, empurra o inimigo com a correnteza e o deixa lento por 4s (69%).',sp:'<b>SOLVENTE E ISQUEIRO</b>: joga a lata de solvente no inimigo, molha tudo e joga o isqueiro: explosão de fogo (81%).',se:'<b>ALUCINAÇÃO</b>: senta nas latas e delira, a tela fica verde e um vulto amarelo de tinta ataca o inimigo com 5 golpes de 25% (125%) e rouba 25% do dano em vida. Não pode ser interrompido.',def:'Defende de guarda.'}},
 };
 const ORDER=['subaz','reymond','dpaul','moraes','kabo','kbene','jota','jorge','hered','vald','berri','brisa'];
 const EXTRA={girl:{pal:{skin:'#d9a07a',hair:'#3a1f2a',hairT:'bleach',up:'#ff6ac0',lo:'#c04aa0',str:'#fff',str2:'#fff',pants:'#5a3a8a',boots:'#222'},bw:.9},
@@ -101,7 +101,7 @@ const EXTRA={girl:{pal:{skin:'#d9a07a',hair:'#3a1f2a',hairT:'bleach',up:'#ff6ac0
 const SKIN=['#b57a52','#8a5a3a','#d9a07a','#6a4430'];
 
 /* ============ ESTADO ============ */
-function newF(i,ch){return {i,ch,x:i?340:140,y:0,vx:0,vy:0,kv:0,face:i?-1:1,hp:MAXHP,en:START_EN,st:'idle',walk:0,atk:null,cast:null,leap:null,cd:0,stun:0,slow:0,burn:0,burnDps:0,burnAcc:0,burnCol:'#ff7a1a',burnBy:0,inv:0,sa:0,spk:0,spkAcc:0,spkBy:0,tin:0,tinAcc:0,tinBy:0,hits:0,stacks:0,stackT:0,thin:0,cl:0,rage:0,away:false,awayDir:1,tf:0,blk:false,cr:false,rc:false,flash:0,ko:false,kt:0,hv:0,win:false,wp:0,ta:{l:0,h:0},pose:'',secOn:false,secSeen:false,js:0,jsT:0}}
+function newF(i,ch){return {i,ch,x:i?340:140,y:0,vx:0,vy:0,kv:0,face:i?-1:1,hp:MAXHP,en:START_EN,st:'idle',walk:0,atk:null,cast:null,leap:null,cd:0,stun:0,slow:0,burn:0,burnDps:0,burnAcc:0,burnCol:'#ff7a1a',burnBy:0,inv:0,sa:0,spk:0,spkAcc:0,spkBy:0,tin:0,tinAcc:0,tinBy:0,imm:0,hits:0,stacks:0,stackT:0,thin:0,cl:0,rage:0,away:false,awayDir:1,tf:0,blk:false,cr:false,rc:false,flash:0,ko:false,kt:0,hv:0,win:false,wp:0,ta:{l:0,h:0},pose:'',secOn:false,secSeen:false,js:0,jsT:0}}
 function newGame(chars,stage,o){
  const G={chars:chars.slice(),p:[newF(0,chars[0]),newF(1,chars[1])],proj:[],fx:[],hf:[],txt:[],banner:null,phase:'intro',pt:0,round:1,wins:[0,0],timer:ROUND_TIME,shake:0,dim:0,ev:[],evn:0,winner:-2,rw:-1,f2:false,tick:0,stage:stage|0};
  G.banner={txt:'ROUND 1',sub:'',col:'#ffd84a',t:0,dur:1.1};
@@ -122,18 +122,20 @@ function basicDmg(p,e,k){
  const c=CH[p.ch];let d=(c.fix!=null?c.fix:c.bp/100*CH[e.ch].spec)*BASIC_SCALE;
  if(p.ch==='jorge'){if(p.js>0)d*=1+.05*p.js;if(p.fire)d*=2}
  if(p.ch==='hered'&&e.wet>0)d+=0.04*CH[e.ch].spec*BASIC_SCALE;
+ if(p.ch==='brisa')d=.07*e.hp;
  if(k==='h')d*=HEAVY_MULT;
- if(p.ch==='brisa')d*=1.05;
  if(p.ch==='kabo'&&p.thin>0)d=.15*e.hp;
  return Math.max(.8,d);
 }
 function burn(T,by,dps,dur,col){T.burn=dur;T.burnDps=dps;T.burnCol=col;T.burnBy=by;T.burnAcc=0}
 const SUB_SK2={name:'ATESTADO SEGUNDA-FEIRA',cd:8,close:null,wind:.3,rec:.4,run:'submao2',skill:1};
+function lockS(V,t,pose){const sa=V.sa;V.sa=0;lock(V,t,pose);V.sa=sa}
 function lock(V,t,pose){if(V.sa>0)return;V.stun=Math.max(V.stun,t);V.atk=null;V.leap=null;V.dash=null;if(V.cast&&V.cast.d.skill&&!V.cast.fired)V.cast=null;if(pose)V.pose=pose}
 function dealHit(G,a,v,dmg,o){
  const A=G.p[a],V=G.p[v];
  if(A.ch==='dpaul'&&A.stacks>0)dmg*=1+Math.min(.15,.0375*A.stacks);
  if(G.phase!=='fight'||V.ko||V.away)return false;
+ if(V.imm>0)return false;
  const kind=o.kind;let blocked=false;
  if((kind==='basic'||kind==='proj')&&V.blk){
   if(CH[A.ch].gb&&kind==='basic'){V.blk=false;V.stun=Math.max(V.stun,.55);ev(G,'break');txt(G,V.x,V.y+70,'ESCUDO RASGADO','#ff9a5a')}
@@ -237,9 +239,9 @@ const RUN={
  bar(G,p,e){lock(e,3.5,'burn');G.fx.push({t:'bar',o:p.i,v:e.i,age:0,dur:3.5,ticks:8,done:0,dmg:95/8})},
  chuveiro(G,p,e){padStart(G,p,e,'vald','shower',40,1.4)},
  bone(G,p,e){G.proj.push({o:p.i,k:'cap',x:p.x+p.face*20,y:p.y+36,vx:p.face*470,dmg:20,age:0,kind:'special',stun:1.6,kb:100,big:1,hideOwner:1,then:{t:'upper',dur:1,hitAt:.6,dmg:60,did:false}})},
- temporal(G,p,e){lock(p,4.4,'rn1');p.sa=2.6;p.ns=true;p.face=e.x>=p.x?1:-1;G.fx.push({t:'rain',o:p.i,v:e.i,age:0,dur:4.4,hitAt:2.5,dmg:69,did:false,dir:e.x>=p.x?1:-1,x:p.x});txt(G,p.x,p.y+90,'SOM DE CHUVA...','#9ad8ff')},
- solvente(G,p,e){lock(p,3.3,'sv1');p.sa=3.4;p.ns=true;p.face=e.x>=p.x?1:-1;G.fx.push({t:'solv',o:p.i,v:e.i,age:0,dur:3.4,dmg:81,st:0,dir:e.x>=p.x?1:-1,x:p.x,fx:p.x})},
- alucina(G,p,e){lock(e,4.1,'');e.atk=null;e.cast=null;e.dash=null;lock(p,4.2,'hz1');p.sa=4.3;p.ns=true;p.face=e.x>=p.x?1:-1;G.fx.push({t:'aluc',o:p.i,v:e.i,age:0,dur:4.2,n:5,done:0,dmg:25,t0:1.0,gap:.55,dir:e.x>=p.x?1:-1,ph:0});txt(G,p.x,p.y+90,'ALUCINAÇÃO...','#6aff7a')},
+ temporal(G,p,e){lockS(p,4.4,'rn1');p.sa=Math.max(p.sa,4.6);p.ns=true;p.face=e.x>=p.x?1:-1;G.fx.push({t:'rain',o:p.i,v:e.i,age:0,dur:4.4,hitAt:2.5,dmg:69,did:false,dir:e.x>=p.x?1:-1,x:p.x});txt(G,p.x,p.y+90,'SOM DE CHUVA...','#9ad8ff')},
+ solvente(G,p,e){lockS(p,3.3,'sv1');p.sa=Math.max(p.sa,3.6);p.ns=true;p.face=e.x>=p.x?1:-1;G.fx.push({t:'solv',o:p.i,v:e.i,age:0,dur:3.4,dmg:81,st:0,dir:e.x>=p.x?1:-1,x:p.x,fx:p.x})},
+ alucina(G,p,e){lock(e,4.1,'');e.atk=null;e.cast=null;e.dash=null;lockS(p,4.2,'hz1');p.sa=Math.max(p.sa,4.3);p.ns=true;p.face=e.x>=p.x?1:-1;G.fx.push({t:'aluc',o:p.i,v:e.i,age:0,dur:4.2,n:5,done:0,dmg:25,t0:1.0,gap:.55,dir:e.x>=p.x?1:-1,ph:0});txt(G,p.x,p.y+90,'ALUCINAÇÃO...','#6aff7a')},
  atrasado(G,p,e){lock(e,3.6,'');lock(p,3.4,'');p.ns=true;G.fx.push({t:'time',o:p.i,v:e.i,age:0,dur:3.2,n:8,done:0,dmg:90/8,side:1,tr:[],t0:.4,gap:.3})},
  quemente(G,p,e){G.fx.push({t:'whisper',o:p.i,v:e.i,n:1,age:0,dur:1.3,hitAt:.5,dmg:80,did:false})},
  sopode(G,p,e){G.fx.push({t:'whisper',o:p.i,v:e.i,n:2,age:0,dur:1.3,hitAt:.5,dmg:78,did:false})},
@@ -251,9 +253,11 @@ function startCast(G,p,e,which){
   const sk=(p.ch==='subaz'&&p.tf>0)?SUB_SK2:c.sk;
   if(p.cd>0){ev(G,'no');return}
   if(sk.close&&(Math.abs(e.x-p.x)>sk.close||Math.abs(e.y-p.y)>60)){ev(G,'no');txt(G,p.x,p.y+78,'LONGE!','#ff8a8a');return}
+  if(p.ch==='brisa'){p.imm=sk.wind+4;p.sa=Math.max(p.sa,sk.wind+4.5)}
   p.cd=sk.cd;p.cast={d:sk,t:0,fired:false};txt(G,p.x,p.y+78,sk.name,'#ffd84a');ev(G,'skill');ev(G,'v_'+p.ch+'_skill');
  }else{
   const d=which==='secret'?c.se:c.sp;
+  if(p.ch==='brisa'){p.imm=d.wind+4;p.sa=Math.max(p.sa,d.wind+4.5)}
   p.en=0;p.cast={d,t:0,fired:false};G.dim=1;if(p.ch==='berri'&&which==='secret'){p.inv=2;p.sa=3.9}
   G.banner={txt:d.name,sub:c.short,col:d.col,t:0,dur:1.4};ev(G,'special');ev(G,'v_'+p.ch+'_'+(which==='secret'?'secret':'special'));
  }
@@ -274,7 +278,7 @@ function stepF(G,i,inp,dt){
  if(p.stun<=0&&p.pose&&!(p.cast&&p.cast.fired&&p.pose==='sit'))p.pose='';
  if(p.ch==='reymond'&&p.tf>0&&p.tf<=25){const el=25-p.tf,lv=el<8?1:el<16?2:3;if(lv>(p.lv|0)){p.lv=lv;if(lv>1){txt(G,p.x,p.y+92,'FÚRIA NÍVEL '+lv+' ('+(lv===2?15:20)+'%)',lv===2?'#ff8ae0':'#ff5a5a');G.fx.push({t:'ring',x:p.x,age:0,dur:.6,col:lv===2?'#ff8ae0':'#ff5a5a'});G.shake=Math.max(G.shake,6)}}}
  if(p.tf>0){p.tf-=dt;if(p.tf<=0){p.tf=0;p.lv=0;txt(G,p.x,p.y+84,'FORMA ACABOU','#d7a8ff');if(p.ch==='subaz')p.cd=Math.max(p.cd,CH.subaz.sk.cd)}}
- if(p.inv>0)p.inv-=dt;if(p.sa>0)p.sa-=dt;
+ if(p.inv>0)p.inv-=dt;if(p.imm>0)p.imm-=dt;if(p.sa>0)p.sa-=dt;
  if(p.tin>0){p.tin-=dt;p.tinAcc+=dt;while(p.tinAcc>=.5){p.tinAcc-=.5;dealHit(G,p.tinBy,i,.02*CH[p.ch].spec*BASIC_SCALE/6,{kind:'dot'});if(G.phase!=='fight')return}if(p.tin<=0)p.tinAcc=0}
  if(p.spk>0){p.spk-=dt;p.spkAcc+=dt;while(p.spkAcc>=.4){p.spkAcc-=.4;dealHit(G,p.spkBy,i,.025*CH[p.ch].spec*BASIC_SCALE/3,{kind:'dot'});if(G.phase!=='fight')return}if(p.spk<=0)p.spkAcc=0}
  if(p.burn>0){p.burn-=dt;p.burnAcc+=dt;while(p.burnAcc>=1){p.burnAcc-=1;dealHit(G,p.burnBy,i,p.burnDps,{kind:'dot'});if(G.phase!=='fight')return}}
@@ -765,6 +769,7 @@ function drawSpriteFighter(c2,p,t,gy,sc){
   c2.restore();
   const tt=tinted(p.ch,col);for(const [ox,oy] of [[-2,0],[2,0],[0,-2],[0,2]])draw(tt,.75*ga,ox,oy);
  }
+ if(p.imm>0&&!p.ko){const pl=.55+.45*Math.sin(t*14),ta=tinted(p.ch,'#ffffff');for(const [ox,oy] of [[-2,0],[2,0],[0,-2],[0,2]])draw(ta,.45*pl*ga,ox,oy)}
  if(p.ch==='reymond'&&p.tf>0&&(p.lv|0)>=2&&!p.ko){
   const pl=.7+.3*Math.sin(t*12),ta=tinted(p.ch,(p.lv|0)>=3?'#ff3a3a':'#ff6ad8');for(const [ox,oy] of [[-3,0],[3,0],[0,-3],[0,3]])draw(ta,.7*pl*ga,ox,oy);
  }
